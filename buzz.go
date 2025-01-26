@@ -307,10 +307,10 @@ var VIEWS = []string{
 }
 
 var TLS_VERSIONS = map[string]uint16{
-	"SSL3.0": tls.VersionSSL30,
 	"TLS1.0": tls.VersionTLS10,
 	"TLS1.1": tls.VersionTLS11,
 	"TLS1.2": tls.VersionTLS12,
+	"TLS1.3": tls.VersionTLS13,
 }
 
 var defaultEditor ViewEditor
@@ -1613,9 +1613,9 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 		case "--tlsv1.2":
 			a.config.General.TLSVersionMin = tls.VersionTLS12
 			a.config.General.TLSVersionMax = tls.VersionTLS12
-		case "-1", "--tlsv1":
-			a.config.General.TLSVersionMin = tls.VersionTLS10
-			a.config.General.TLSVersionMax = tls.VersionTLS12
+		case "--tlsv1.3":
+			a.config.General.TLSVersionMin = tls.VersionTLS13
+			a.config.General.TLSVersionMax = tls.VersionTLS13
 		case "-T", "--tls":
 			if arg_index >= args_len-1 {
 				return errors.New("missing TLS version range: MIN,MAX")
@@ -1794,9 +1794,9 @@ func setViewTextAndCursor(v *gocui.View, s string) {
 }
 
 func help() {
-	fmt.Println(`wuzz - Interactive cli tool for HTTP inspection
+	fmt.Println(`buzz - Interactive cli tool for HTTP inspection
 
-Usage: wuzz [-H|--header HEADER]... [-d|--data|--data-binary DATA] [-X|--request METHOD] [-t|--timeout MSECS] [URL]
+Usage: buzz [-H|--header HEADER]... [-d|--data|--data-binary DATA] [-X|--request METHOD] [-t|--timeout MSECS] [URL]
 
 Other command line options:
   -c, --config PATH        Specify custom configuration file
@@ -1808,13 +1808,13 @@ Other command line options:
   -j, --json JSON          Add JSON request data and set related request headers
   -k, --insecure           Allow insecure SSL certs
   -R, --disable-redirects  Do not follow HTTP redirects
-  -T, --tls MIN,MAX        Restrict allowed TLS versions (values: SSL3.0,TLS1.0,TLS1.1,TLS1.2)
+  -T, --tls MIN,MAX        Restrict allowed TLS versions (values: TLS1.0,TLS1.1,TLS1.2,TLS1.3)
                            Examples: wuzz -T TLS1.1        (TLS1.1 only)
                                      wuzz -T TLS1.0,TLS1.1 (from TLS1.0 up to TLS1.1)
   --tlsv1.0                Forces TLS1.0 only
   --tlsv1.1                Forces TLS1.1 only
   --tlsv1.2                Forces TLS1.2 only
-  -1, --tlsv1              Forces TLS version 1.x (1.0, 1.1 or 1.2)
+  --tlsv1.3                Forces TLS1.3 only
   -v, --version            Display version number
   -x, --proxy URL          Set HTTP(S) or SOCKS5 proxy
 
@@ -1840,7 +1840,7 @@ func main() {
 			help()
 			return
 		case "-v", "--version":
-			fmt.Printf("wuzz %v\n", VERSION)
+			fmt.Printf("buzz %v\n", VERSION)
 			return
 		case "-c", "--config":
 			configPath = os.Args[i+1]
