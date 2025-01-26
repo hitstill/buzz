@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -10,6 +11,7 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -1650,12 +1652,14 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			switch u.Scheme {
 			case "", "http", "https":
 				TRANSPORT.Proxy = http.ProxyURL(u)
-			case "socks", "socks5":
-				dialer, err := proxy.SOCKS5("tcp", u.Host, nil, proxy.Direct)
+			case "socks5h", "socks5":
+				dialer, err := proxy.FromURL(u, proxy.Direct)
 				if err != nil {
 					return fmt.Errorf("can't connect to proxy: %v", err)
 				}
-				TRANSPORT.Dial = dialer.Dial
+				TRANSPORT.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+					return dialer.Dial(network, addr)
+				}
 			default:
 				return errors.New("unknown proxy protocol")
 			}
