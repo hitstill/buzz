@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -534,7 +533,6 @@ func (e singleLineEditor) Edit(v *gocui.View, key gocui.Key, ch rune, mod gocui.
 
 func (a *App) getResponseViewEditor(g *gocui.Gui) gocui.Editor {
 	return &ViewEditor{a, g, false, gocui.EditorFunc(func(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
-		return
 	})}
 }
 
@@ -641,7 +639,7 @@ func (a *App) setViewByName(g *gocui.Gui, name string) error {
 			return a.setView(g)
 		}
 	}
-	return fmt.Errorf("View not found")
+	return fmt.Errorf("view not found")
 }
 
 func popup(g *gocui.Gui, msg string) {
@@ -890,7 +888,7 @@ func (a *App) SubmitRequest(g *gocui.Gui, _ *gocui.View) error {
 			}
 		}
 
-		bodyBytes, err := ioutil.ReadAll(response.Body)
+		bodyBytes, err := io.ReadAll(response.Body)
 		if err == nil {
 			r.RawResponseBody = bodyBytes
 		}
@@ -1001,7 +999,7 @@ func parseKey(k string) (interface{}, gocui.Modifier, error) {
 	}
 	switch len(k) {
 	case 0:
-		return 0, 0, errors.New("Empty key string")
+		return 0, 0, errors.New("empty key string")
 	case 1:
 		if mod != gocui.ModNone {
 			k = strings.ToLower(k)
@@ -1011,7 +1009,7 @@ func parseKey(k string) (interface{}, gocui.Modifier, error) {
 
 	key, found := KEYS[k]
 	if !found {
-		return 0, 0, fmt.Errorf("Unknown key: %v", k)
+		return 0, 0, fmt.Errorf("unknown key: %v", k)
 	}
 	return key, mod, nil
 }
@@ -1032,11 +1030,11 @@ func (a *App) setKey(g *gocui.Gui, keyStr, commandStr, viewName string) error {
 	}
 	keyFnGen, found := COMMANDS[command]
 	if !found {
-		return fmt.Errorf("Unknown command: %v", command)
+		return fmt.Errorf("unknown command: %v", command)
 	}
 	keyFn := keyFnGen(commandArgs, a)
 	if err := g.SetKeybinding(viewName, key, mod, keyFn); err != nil {
-		return fmt.Errorf("Failed to set key '%v': %v", keyStr, err)
+		return fmt.Errorf("failed to set key '%v': %v", keyStr, err)
 	}
 	return nil
 }
@@ -1213,7 +1211,7 @@ func (a *App) CreatePopupView(name string, width, height int, g *gocui.Gui) (v *
 }
 
 func (a *App) LoadRequest(g *gocui.Gui, loadLocation string) (err error) {
-	requestJson, ioErr := ioutil.ReadFile(loadLocation)
+	requestJson, ioErr := os.ReadFile(loadLocation)
 	if ioErr != nil {
 		g.Update(func(g *gocui.Gui) error {
 			vrb, _ := g.View(RESPONSE_BODY_VIEW)
@@ -1356,7 +1354,7 @@ func (a *App) SaveRequest(g *gocui.Gui, _ *gocui.View) (err error) {
 				request := EXPORT_FORMATS[format].export(r)
 
 				// Write the file
-				ioerr := ioutil.WriteFile(saveLocation, []byte(request), 0644)
+				ioerr := os.WriteFile(saveLocation, []byte(request), 0644)
 
 				saveResult := fmt.Sprintf("Request saved successfully in %s", EXPORT_FORMATS[format].name)
 				if ioerr != nil {
@@ -1513,7 +1511,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 	g.SetCurrentView(VIEWS[a.viewIndex])
 	vheader, err := g.View(REQUEST_HEADERS_VIEW)
 	if err != nil {
-		return errors.New("Too small screen")
+		return errors.New("too small screen")
 	}
 	vheader.Clear()
 	vget, _ := g.View(URL_PARAMS_VIEW)
@@ -1531,14 +1529,14 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 		switch arg {
 		case "-H", "--header":
 			if arg_index == args_len-1 {
-				return errors.New("No header value specified")
+				return errors.New("no header value specified")
 			}
 			arg_index += 1
 			header := args[arg_index]
 			fmt.Fprintf(vheader, "%v\n", header)
 		case "-d", "--data", "--data-binary", "--data-urlencode":
 			if arg_index == args_len-1 {
-				return errors.New("No POST/PUT/PATCH value specified")
+				return errors.New("no POST/PUT/PATCH value specified")
 			}
 
 			arg_index += 1
@@ -1559,7 +1557,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			body_data = append(body_data, arg_data)
 		case "-j", "--json":
 			if arg_index == args_len-1 {
-				return errors.New("No POST/PUT/PATCH value specified")
+				return errors.New("no POST/PUT/PATCH value specified")
 			}
 
 			arg_index += 1
@@ -1571,7 +1569,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			setViewTextAndCursor(vdata, json_str)
 		case "-X", "--request":
 			if arg_index == args_len-1 {
-				return errors.New("No HTTP method specified")
+				return errors.New("no HTTP method specified")
 			}
 			arg_index++
 			set_method = true
@@ -1583,12 +1581,12 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			setViewTextAndCursor(vmethod, method)
 		case "-t", "--timeout":
 			if arg_index == args_len-1 {
-				return errors.New("No timeout value specified")
+				return errors.New("no timeout value specified")
 			}
 			arg_index += 1
 			timeout, err := strconv.Atoi(args[arg_index])
 			if err != nil || timeout <= 0 {
-				return errors.New("Invalid timeout value")
+				return errors.New("invalid timeout value")
 			}
 			a.config.General.Timeout = config.Duration{Duration: time.Duration(timeout) * time.Millisecond}
 		case "--compressed":
@@ -1598,7 +1596,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			}
 		case "-e", "--editor":
 			if arg_index == args_len-1 {
-				return errors.New("No timeout value specified")
+				return errors.New("no timeout value specified")
 			}
 			arg_index += 1
 			a.config.General.Editor = args[arg_index]
@@ -1620,7 +1618,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			a.config.General.TLSVersionMax = tls.VersionTLS12
 		case "-T", "--tls":
 			if arg_index >= args_len-1 {
-				return errors.New("Missing TLS version range: MIN,MAX")
+				return errors.New("missing TLS version range: MIN,MAX")
 			}
 			arg_index++
 			arg := args[arg_index]
@@ -1642,12 +1640,12 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			a.config.General.TLSVersionMax = maxV
 		case "-x", "--proxy":
 			if arg_index == args_len-1 {
-				return errors.New("Missing proxy URL")
+				return errors.New("missing proxy URL")
 			}
 			arg_index += 1
 			u, err := url.Parse(args[arg_index])
 			if err != nil {
-				return fmt.Errorf("Invalid proxy URL: %v", err)
+				return fmt.Errorf("invalid proxy URL: %v", err)
 			}
 			switch u.Scheme {
 			case "", "http", "https":
@@ -1655,15 +1653,15 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			case "socks", "socks5":
 				dialer, err := proxy.SOCKS5("tcp", u.Host, nil, proxy.Direct)
 				if err != nil {
-					return fmt.Errorf("Can't connect to proxy: %v", err)
+					return fmt.Errorf("can't connect to proxy: %v", err)
 				}
 				TRANSPORT.Dial = dialer.Dial
 			default:
-				return errors.New("Unknown proxy protocol")
+				return errors.New("unknown proxy protocol")
 			}
 		case "-F", "--form":
 			if arg_index == args_len-1 {
-				return errors.New("No POST/PUT/PATCH value specified")
+				return errors.New("no POST/PUT/PATCH value specified")
 			}
 
 			arg_index += 1
@@ -1686,7 +1684,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			}
 			parsed_url, err := url.Parse(u)
 			if err != nil || parsed_url.Host == "" {
-				return errors.New("Invalid url")
+				return errors.New("invalid url")
 			}
 			if parsed_url.Path == "" {
 				parsed_url.Path = "/"

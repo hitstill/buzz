@@ -16,7 +16,7 @@ type StatusLineFunctions struct {
 	app *App
 }
 
-func (_ *StatusLineFunctions) Version() string {
+func (*StatusLineFunctions) Version() string {
 	return VERSION
 }
 

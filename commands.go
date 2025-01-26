@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -32,7 +31,7 @@ var COMMANDS map[string]func(string, *App) CommandFunc = map[string]func(string,
 						return nil
 					}
 
-					err := ioutil.WriteFile(saveLocation, req.RawResponseBody, 0644)
+					err := os.WriteFile(saveLocation, req.RawResponseBody, 0644)
 
 					var saveResult string
 					if err == nil {
@@ -219,7 +218,7 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 }
 
 func openEditor(g *gocui.Gui, v *gocui.View, editor string) error {
-	file, err := ioutil.TempFile(os.TempDir(), "wuzz-")
+	file, err := os.CreateTemp(os.TempDir(), "wuzz-")
 	if err != nil {
 		return nil
 	}
@@ -259,7 +258,7 @@ func openEditor(g *gocui.Gui, v *gocui.View, editor string) error {
 		return nil
 	}
 
-	newVal, err := ioutil.ReadFile(file.Name())
+	newVal, err := os.ReadFile(file.Name())
 	if err != nil {
 		return nil
 	}
