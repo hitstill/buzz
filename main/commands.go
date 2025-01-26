@@ -31,7 +31,7 @@ var COMMANDS map[string]func(string, *App) CommandFunc = map[string]func(string,
 						return nil
 					}
 
-					err := os.WriteFile(saveLocation, req.RawResponseBody, 0644)
+					err := os.WriteFile(saveLocation, req.RawResponseBody, 0o644)
 
 					var saveResult string
 					if err == nil {

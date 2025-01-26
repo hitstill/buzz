@@ -52,25 +52,25 @@ func TestFormat(t *testing.T) {
 }
 
 func TestTitle(t *testing.T) {
-	//binary
+	// binary
 	title := New(configFixture(true), "octet-stream").Title()
 	if title != "[binary]" {
 		t.Error("for octet-stream content type expected title ", title, "to be [binary]")
 	}
 
-	//html
+	// html
 	title = New(configFixture(true), "text/html; charset=utf-8").Title()
 	if title != "[html]" {
 		t.Error("For text/html content type expected title ", title, " to be [html]")
 	}
 
-	//json
+	// json
 	title = New(configFixture(true), "application/json; charset=utf-8").Title()
 	if title != "[json]" {
 		t.Error("For text/html content type expected title ", title, " to be [json]")
 	}
 
-	//text
+	// text
 	title = New(configFixture(true), "text/plain; charset=utf-8").Title()
 	if title != "[text]" {
 		t.Error("For text/html content type expected title ", title, " to be [text]")
@@ -92,7 +92,6 @@ func TestSearchable(t *testing.T) {
 	if !New(configFixture(true), "text/plain").Searchable() {
 		t.Error("text/plain should be searchable")
 	}
-
 }
 
 func configFixture(jsonEnabled bool) *config.Config {

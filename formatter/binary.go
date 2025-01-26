@@ -7,8 +7,7 @@ import (
 	"io"
 )
 
-type binaryFormatter struct {
-}
+type binaryFormatter struct{}
 
 func (f *binaryFormatter) Format(writer io.Writer, data []byte) error {
 	fmt.Fprint(writer, hex.Dump(data))
