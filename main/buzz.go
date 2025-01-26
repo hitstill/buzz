@@ -1497,7 +1497,7 @@ func (a *App) restoreRequest(g *gocui.Gui, idx int) {
 func (a *App) LoadConfig(configPath string) error {
 	if configPath == "" {
 		// Load config from default path
-		configPath = config.GetDefaultConfigLocation()
+		configPath, _ = config.GetDefaultConfigLocation()
 	}
 
 	// If the config file doesn't exist, load the default config
