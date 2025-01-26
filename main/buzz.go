@@ -569,6 +569,9 @@ func setView(g *gocui.Gui, viewName string) (*gocui.View, error) {
 }
 
 func setViewProperties(v *gocui.View, name string) {
+	v.SelFgColor = gocui.ColorGreen
+	v.FgColor = gocui.ColorCyan
+	v.Highlight = true
 	v.Title = VIEW_PROPERTIES[name].title
 	v.Frame = VIEW_PROPERTIES[name].frame
 	v.Editable = VIEW_PROPERTIES[name].editable
@@ -1780,8 +1783,6 @@ func (a *App) InitConfig() {
 
 func refreshStatusLine(a *App, g *gocui.Gui) {
 	sv, _ := g.View(STATUSLINE_VIEW)
-	sv.BgColor = gocui.ColorDefault | gocui.AttrReverse
-	sv.FgColor = gocui.ColorDefault | gocui.AttrReverse
 	a.statusLine.Update(sv, a)
 }
 
@@ -1789,7 +1790,7 @@ func initApp(a *App, g *gocui.Gui) {
 	g.Cursor = true
 	g.InputEsc = false
 	g.BgColor = gocui.ColorDefault
-	g.FgColor = gocui.ColorDefault
+	g.FgColor = gocui.Attribute(termbox.ColorLightBlue)
 	g.SetManagerFunc(a.Layout)
 }
 
