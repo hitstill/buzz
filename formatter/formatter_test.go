@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/asciimoo/wuzz/config"
+	"github.com/hitstill/buzz/config"
 	"github.com/nwidger/jsoncolor"
 	"github.com/x86kernel/htmlcolor"
 )

@@ -1,4 +1,4 @@
-module github.com/asciimoo/wuzz
+module github.com/hitstill/buzz
 
 go 1.23
 

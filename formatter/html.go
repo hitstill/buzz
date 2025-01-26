@@ -10,7 +10,7 @@ import (
 )
 
 type htmlFormatter struct {
-	parsedBody goquery.Document
+	_ goquery.Document
 	TextFormatter
 }
 

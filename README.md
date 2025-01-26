@@ -1,8 +1,8 @@
-# wuzz
+# buzz
 
-Interactive cli tool for HTTP inspection.
+This is maintained fork of Adam Tauber's [wuzz](https://github.com/asciimoo/wuzz) Interactive cli tool for HTTP inspection.
 
-Wuzz command line arguments are similar to cURL's arguments,
+Buzz command line arguments are similar to cURL's arguments,
 so it can be used to inspect/modify requests copied from the
 browser's network inspector with the "copy as cURL" feature.
 
@@ -12,11 +12,11 @@ browser's network inspector with the "copy as cURL" feature.
 ## Installation and usage
 
 ```
-$ go get github.com/asciimoo/wuzz
-$ "$GOPATH/bin/wuzz" --help
+$ go get github.com/hitstill/buzz
+$ "$GOPATH/bin/buzz" --help
 ```
 
-Note: golang >= 1.10 required.
+Note: golang >= 1.23 required.
 
 [Binary releases](https://github.com/asciimoo/wuzz/releases) are also available.
 
@@ -63,7 +63,7 @@ Keybinding                              | Description
 
 ### Context specific search
 
-Wuzz accepts regular expressions by default to filter response body.
+Buzz accepts regular expressions by default to filter response body.
 Custom query syntax can be toggled by pressing <kbd>Ctrl+T</kbd>.
 The following formats have context specific search syntax:
 
@@ -82,5 +82,4 @@ JSON             | https://github.com/tidwall/gjson
 
 ## Bugs / Suggestions
 
-Bugs or suggestions? Visit the [issue tracker](https://github.com/asciimoo/wuzz/issues)
-or join `#wuzz` on freenode
+Bugs or suggestions? Visit the [issue tracker](https://github.com/hitstill/buzz/issues)

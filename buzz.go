@@ -23,8 +23,8 @@ import (
 
 	"golang.org/x/net/proxy"
 
-	"github.com/asciimoo/wuzz/config"
-	"github.com/asciimoo/wuzz/formatter"
+	"github.com/hitstill/buzz/config"
+	"github.com/hitstill/buzz/formatter"
 
 	"github.com/alessio/shellescape"
 	"github.com/jroimartin/gocui"

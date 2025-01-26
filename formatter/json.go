@@ -37,7 +37,7 @@ func (f *jsonFormatter) Search(q string, body []byte) ([]string, error) {
 		}
 		searchResult := f.parsedBody.Get(q)
 		if searchResult.Type == gjson.Null {
-			return nil, errors.New("Invalid gjson query or no results found")
+			return nil, errors.New("invalid gjson query or no results found")
 		}
 		if searchResult.Type != gjson.JSON {
 			return []string{searchResult.String()}, nil
@@ -49,7 +49,7 @@ func (f *jsonFormatter) Search(q string, body []byte) ([]string, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, len(body)))
 	err := jsonFormatter.Format(buf, body)
 	if err != nil {
-		return nil, errors.New("Invalid results")
+		return nil, errors.New("invalid results")
 	}
-	return []string{string(buf.Bytes())}, nil
+	return []string{buf.String()}, nil
 }
