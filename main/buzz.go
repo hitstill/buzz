@@ -32,7 +32,7 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-const VERSION = "0.5.0"
+const VERSION = "0.5.1-rc1"
 
 const (
 	TIMEOUT_DURATION = 5 // in seconds
