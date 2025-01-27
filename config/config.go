@@ -4,11 +4,9 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/mitchellh/go-homedir"
 )
 
 var ContentTypes = map[string]string{
@@ -107,7 +105,7 @@ var DefaultConfig = Config{
 		FormatJSON:             true,
 		Insecure:               false,
 		PreserveScrollPosition: true,
-		StatusLine:             "[wuzz {{.Version}}]{{if .Duration}} [Response time: {{.Duration}}]{{end}} [Request no.: {{.RequestNumber}}/{{.HistorySize}}] [Search type: {{.SearchType}}]{{if .DisableRedirect}} [Redirects Restricted Mode {{.DisableRedirect}}]{{end}}",
+		StatusLine:             "[buzz {{.Version}}]{{if .Duration}} [Response time: {{.Duration}}]{{end}} [Request no.: {{.RequestNumber}}/{{.HistorySize}}] [Search type: {{.SearchType}}]{{if .DisableRedirect}} [Redirects Restricted Mode {{.DisableRedirect}}]{{end}}",
 		Timeout: Duration{
 			defaultTimeoutDuration,
 		},
@@ -122,7 +120,7 @@ func init() {
 
 func LoadConfig(configFile string) (*Config, error) {
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		return nil, errors.New("Config file does not exist.")
+		return nil, errors.New("config file does not exist")
 	} else if err != nil {
 		return nil, err
 	}
@@ -153,23 +151,12 @@ func LoadConfig(configFile string) (*Config, error) {
 	return &conf, nil
 }
 
-func GetDefaultConfigLocation() string {
-	var configFolderLocation string
-	switch runtime.GOOS {
-	case "linux":
-		// Use the XDG_CONFIG_HOME variable if it is set, otherwise
-		// $HOME/.config/wuzz/config.toml
-		xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
-		if xdgConfigHome != "" {
-			configFolderLocation = xdgConfigHome
-		} else {
-			configFolderLocation, _ = homedir.Expand("~/.config/wuzz/")
-		}
+func GetDefaultConfigLocation() (string, error) {
+	configDirLocation, err := os.UserConfigDir()
 
-	default:
-		// On other platforms we just use $HOME/.wuzz
-		configFolderLocation, _ = homedir.Expand("~/.wuzz/")
+	if err != nil {
+		return "", err
 	}
 
-	return filepath.Join(configFolderLocation, "config.toml")
+	return filepath.Join(configDirLocation, "buzz/config.toml"), nil
 }

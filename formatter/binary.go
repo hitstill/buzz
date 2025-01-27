@@ -7,8 +7,7 @@ import (
 	"io"
 )
 
-type binaryFormatter struct {
-}
+type binaryFormatter struct{}
 
 func (f *binaryFormatter) Format(writer io.Writer, data []byte) error {
 	fmt.Fprint(writer, hex.Dump(data))
@@ -24,5 +23,5 @@ func (f *binaryFormatter) Searchable() bool {
 }
 
 func (f *binaryFormatter) Search(q string, body []byte) ([]string, error) {
-	return nil, errors.New("Cannot perform search on binary content type")
+	return nil, errors.New("cannot perform search on binary content type")
 }

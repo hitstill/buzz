@@ -5,7 +5,7 @@ import (
 	"mime"
 	"strings"
 
-	"github.com/asciimoo/wuzz/config"
+	"github.com/hitstill/buzz/config"
 )
 
 type ResponseFormatter interface {
@@ -21,7 +21,7 @@ func New(appConfig *config.Config, contentType string) ResponseFormatter {
 		return &jsonFormatter{}
 	} else if strings.Contains(contentType, "text/html") {
 		return &htmlFormatter{}
-	} else if strings.Index(contentType, "text") == -1 && strings.Index(contentType, "application") == -1 {
+	} else if !strings.Contains(contentType, "text") && !strings.Contains(contentType, "application") {
 		return &binaryFormatter{}
 	} else {
 		return &TextFormatter{}

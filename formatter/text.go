@@ -5,8 +5,7 @@ import (
 	"regexp"
 )
 
-type TextFormatter struct {
-}
+type TextFormatter struct{}
 
 func (f *TextFormatter) Format(writer io.Writer, data []byte) error {
 	_, err := writer.Write(data)
