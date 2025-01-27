@@ -93,7 +93,7 @@ VERSION := $(shell \
     if [ "$(VERSION_STRATEGY)" = "git" ] && git rev-parse --git-dir > /dev/null 2>&1; then \
         git describe --tags --always --dirty 2>/dev/null || echo "dev"; \
     elif [ "$(VERSION_STRATEGY)" = "semver" ]; then \
-        cat VERSION 2>/dev/null || echo "0.1.0"; \
+        echo $(VERSION) 2>/dev/null || echo "0.1.0"; \
     else \
         date -u '+%Y%m%d-%H%M%S'; \
     fi)
@@ -135,7 +135,7 @@ GOFILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path
 GOPACKAGES = $(shell $(GO) list ./... | grep -v /vendor/)
 
 # Build Configuration
-BUILD_TAGS ?= 
+BUILD_TAGS ?=
 EXTRA_TAGS ?=
 ALL_TAGS = $(BUILD_TAGS) $(EXTRA_TAGS)
 
@@ -373,7 +373,7 @@ security: ## Run security checks
 # =============================================================================
 .PHONY: build-all
 build-all: $(DIST_DIR) ## Build for all platforms
-	$(WORKING) Building for all platforms...
+	@$(WORKING) Building for all platforms...
 	@$(foreach platform,$(PLATFORMS),\
 		$(eval OS := $(word 1,$(subst /, ,$(platform)))) \
 		$(eval ARCH := $(word 2,$(subst /, ,$(platform)))) \
@@ -383,7 +383,7 @@ build-all: $(DIST_DIR) ## Build for all platforms
 		CGO_ENABLED=$(CGO_ENABLED) \
 		$(GO) build -tags '$(ALL_TAGS)' \
 			-ldflags '$(LD_FLAGS)' \
-			-o $(DIST_DIR)/$(PROJECT_NAME)-$(OS)-$(ARCH)$(if $(VERSION),v$(VERSION))$(if $(findstring windows,$(OS)),.exe,) \
+			-o $(DIST_DIR)/$(PROJECT_NAME)-$(OS)-$(ARCH)$(if $(VERSION),-v$(VERSION))$(if $(findstring windows,$(OS)),.exe,) \
 			./main ; \
 	)
 	@$(PACKAGE) Creating release archives...
