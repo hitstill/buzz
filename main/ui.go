@@ -791,6 +791,14 @@ func (a *App) SetKeys(g *gocui.Gui) error {
 		return nil
 	})
 
+	g.SetKeybinding(ALL_VIEWS, gocui.MouseRelease, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		if g.CurrentView() != v {
+			g.SetCurrentView(v.Name())
+			v.SetCursor(0, 0)
+		}
+		return nil
+	})
+
 	g.SetKeybinding(ALL_VIEWS, gocui.KeyF11, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		a.config.General.FollowRedirects = !a.config.General.FollowRedirects
 		refreshStatusLine(a, g)
@@ -1115,6 +1123,7 @@ func refreshStatusLine(a *App, g *gocui.Gui) {
 
 func initApp(a *App, g *gocui.Gui) {
 	g.Cursor = true
+	g.Mouse = true
 	g.InputEsc = false
 	g.BgColor = gocui.ColorDefault
 	g.FgColor = gocui.Attribute(termbox.ColorLightBlue)
