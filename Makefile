@@ -93,7 +93,7 @@ VERSION := $(shell \
     if [ "$(VERSION_STRATEGY)" = "git" ] && git rev-parse --git-dir > /dev/null 2>&1; then \
         git describe --tags --always --dirty 2>/dev/null || echo "dev"; \
     elif [ "$(VERSION_STRATEGY)" = "semver" ]; then \
-        cat VERSION 2>/dev/null || echo "0.1.0"; \
+        echo $(VERSION) 2>/dev/null || echo "0.1.0"; \
     else \
         date -u '+%Y%m%d-%H%M%S'; \
     fi)
@@ -135,7 +135,7 @@ GOFILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path
 GOPACKAGES = $(shell $(GO) list ./... | grep -v /vendor/)
 
 # Build Configuration
-BUILD_TAGS ?= 
+BUILD_TAGS ?=
 EXTRA_TAGS ?=
 ALL_TAGS = $(BUILD_TAGS) $(EXTRA_TAGS)
 
@@ -211,7 +211,7 @@ TRASH := echo "$(YELLOW)🗑️  $(RESET)"
 # =============================================================================
 .PHONY: init
 init: ## Initialize project with sensible defaults
-	$(INFO) Initializing project...
+	@$(INFO) Initializing project...
 	@if [ ! -f "go.mod" ]; then \
 		$(GO) mod init $(shell basename $(CURDIR)); \
 	fi
@@ -232,19 +232,19 @@ init: ## Initialize project with sensible defaults
 		echo 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}' > main/main.go; \
 	fi
 	$(MAKE) deps
-	$(SUCCESS) Project initialized!
+	@$(SUCCESS) Project initialized!
 
 .PHONY: build
 build: $(BIN_DIR) ## Build all targets
-	$(WORKING) Building project...
+	@$(WORKING) Building project...
 	@$(foreach target,$(BUILD_TARGETS),\
 		$(MAKE) build-target TARGET=$(target) $(if $(filter true,$(ENABLE_PARALLEL)),--jobs=$(PARALLEL_JOBS)) &)
 	@wait
-	$(SUCCESS) Build complete!
+	@$(SUCCESS) Build complete!
 
 .PHONY: build-target
 build-target: generate
-	$(INFO) Building $(TARGET)...
+	@$(INFO) Building $(TARGET)...
 	@if [ -f "$(TARGET)/Makefile" ]; then \
 		$(MAKE) -C $(TARGET) build; \
 	else \
@@ -260,9 +260,9 @@ build-target: generate
 
 .PHONY: install
 install: build ## Install the application
-	$(WORKING) Installing $(PROJECT_NAME)...
+	@$(WORKING) Installing $(PROJECT_NAME)...
 	$(GO) install -tags '$(ALL_TAGS)' -ldflags '$(LD_FLAGS)' ./main
-	$(SUCCESS) Installation complete!
+	@$(SUCCESS) Installation complete!
 
 # =============================================================================
 # 🔄 Development Workflow
@@ -274,29 +274,29 @@ dev: deps generate ## Start development environment
 		cp $(CONFIG_DIR)/air.toml.example .air.toml 2>/dev/null || \
 		curl -sL https://raw.githubusercontent.com/air-verse/air/refs/heads/master/air_example.toml > .air.toml; \
 	fi
-	$(ROCKET) Running with hot reload...
+	@$(ROCKET) Running with hot reload...
 	$(AIR) -c .air.toml
 
 .PHONY: run
 run: build ## Run the application
-	$(ROCKET) Running $(PROJECT_NAME)...
+	@$(ROCKET) Running $(PROJECT_NAME)...
 	$(BIN_DIR)/$(PROJECT_NAME)
 
 .PHONY: generate
 generate: ## Run code generation
-	$(WORKING) Running code generation...
+	@$(WORKING) Running code generation...
 	$(GO) generate ./...
 	@if [ -n "$(wildcard $(PROTO_DIR)/*.proto)" ]; then \
 		$(MAKE) proto; \
 	fi
-	$(SUCCESS) Generation complete!
+	@$(SUCCESS) Generation complete!
 
 # =============================================================================
 # 🧪 Testing & Quality
 # =============================================================================
 .PHONY: test
 test: ## Run tests
-	$(INFO) Running tests...
+	@$(INFO) Running tests...
 	$(GO) test $(TEST_FLAGS) \
 		-timeout $(TEST_TIMEOUT) \
 		-run '$(TEST_PATTERN)' \
@@ -305,7 +305,7 @@ test: ## Run tests
 
 .PHONY: test-coverage
 test-coverage: ## Run tests with coverage
-	$(INFO) Running tests with coverage...
+	@$(INFO) Running tests with coverage...
 	$(GO) test $(TEST_FLAGS) \
 		-timeout $(TEST_TIMEOUT) \
 		-coverprofile=$(COVERAGE_OUT) \
@@ -316,11 +316,11 @@ test-coverage: ## Run tests with coverage
 		$(ERROR) "Coverage $${coverage}% is below threshold $(COVERAGE_THRESHOLD)%"; \
 		exit 1; \
 	fi
-	$(SUCCESS) Coverage report generated: $(COVERAGE_HTML)
+	@$(SUCCESS) Coverage report generated: $(COVERAGE_HTML)
 
 .PHONY: test-integration
 test-integration: ## Run integration tests
-	$(INFO) Running integration tests...
+	@$(INFO) Running integration tests...
 	$(GO) test $(TEST_FLAGS) \
 		-tags=integration \
 		-timeout $(TEST_TIMEOUT) \
@@ -328,7 +328,7 @@ test-integration: ## Run integration tests
 
 .PHONY: test-e2e
 test-e2e: ## Run end-to-end tests
-	$(INFO) Running end-to-end tests...
+	@$(INFO) Running end-to-end tests...
 	$(GO) test $(TEST_FLAGS) \
 		-tags=e2e \
 		-timeout $(TEST_TIMEOUT) \
@@ -336,7 +336,7 @@ test-e2e: ## Run end-to-end tests
 
 .PHONY: bench
 bench: ## Run benchmarks
-	$(INFO) Running benchmarks...
+	@$(INFO) Running benchmarks...
 	$(GO) test -bench=. \
 		$(BENCH_FLAGS) \
 		-run=^$ \
@@ -345,35 +345,35 @@ bench: ## Run benchmarks
 
 .PHONY: lint
 lint: ## Run linters
-	$(INFO) Running linters...
+	@$(INFO) Running linters...
 	$(GOLANGCI_LINT) run --fix
-	$(SUCCESS) Lint complete!
+	#$(SUCCESS) Lint complete!
 
 .PHONY: fmt
 fmt: ## Format code
-	$(INFO) Formatting code...
+	#$(INFO) Formatting code...
 	$(GO) fmt ./...
 	$(GOFUMPT) -l -w .
-	$(SUCCESS) Format complete!
+	@$(SUCCESS) Format complete!
 
 .PHONY: vet
 vet: ## Run go vet
-	$(INFO) Running go vet...
+	@$(INFO) Running go vet...
 	$(GO) vet ./...
-	$(SUCCESS) Vet complete!
+	@$(SUCCESS) Vet complete!
 
 .PHONY: security
 security: ## Run security checks
-	$(INFO) Running security checks...
+	@$(INFO) Running security checks...
 	$(GOVULNCHECK) ./...
-	$(SUCCESS) Security check complete!
+	@$(SUCCESS) Security check complete!
 
 # =============================================================================
 # 🏗️ Build Variations
 # =============================================================================
 .PHONY: build-all
-build-all: $(DIST_DIR) ## Build for all platforms
-	$(WORKING) Building for all platforms...
+build-all: $(DIST_DIR) clean ## Build for all platforms
+	@$(WORKING) Building for all platforms...
 	@$(foreach platform,$(PLATFORMS),\
 		$(eval OS := $(word 1,$(subst /, ,$(platform)))) \
 		$(eval ARCH := $(word 2,$(subst /, ,$(platform)))) \
@@ -383,7 +383,7 @@ build-all: $(DIST_DIR) ## Build for all platforms
 		CGO_ENABLED=$(CGO_ENABLED) \
 		$(GO) build -tags '$(ALL_TAGS)' \
 			-ldflags '$(LD_FLAGS)' \
-			-o $(DIST_DIR)/$(PROJECT_NAME)-$(OS)-$(ARCH)$(if $(VERSION),v$(VERSION))$(if $(findstring windows,$(OS)),.exe,) \
+			-o $(DIST_DIR)/$(PROJECT_NAME)-$(OS)-$(ARCH)$(if $(VERSION),-v$(VERSION))$(if $(findstring windows,$(OS)),.exe,) \
 			./main ; \
 	)
 	@$(PACKAGE) Creating release archives...
@@ -410,7 +410,7 @@ build-race: build
 # =============================================================================
 .PHONY: docker-build
 docker-build: ## Build Docker image
-	$(WORKING) Building Docker image...
+	@$(WORKING) Building Docker image...
 	docker build $(DOCKER_BUILD_ARGS) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg BUILD_TIME=$(BUILD_TIME) \
@@ -418,17 +418,17 @@ docker-build: ## Build Docker image
 		-f $(DOCKERFILE) \
 		-t $(DOCKER_IMAGE):$(DOCKER_TAG) \
 		$(DOCKER_BUILD_CONTEXT)
-	$(SUCCESS) Docker image built!
+	@$(SUCCESS) Docker image built!
 
 .PHONY: docker-push
 docker-push: ## Push Docker image
-	$(WORKING) Pushing Docker image...
+	@$(WORKING) Pushing Docker image...
 	docker push $(DOCKER_IMAGE):$(DOCKER_TAG)
-	$(SUCCESS) Docker image pushed!
+	@$(SUCCESS) Docker image pushed!
 
 .PHONY: docker-run
 docker-run: ## Run Docker container
-	$(ROCKET) Running Docker container...
+	@$(ROCKET) Running Docker container...
 	docker run --rm -it $(DOCKER_IMAGE):$(DOCKER_TAG)
 
 # =============================================================================
@@ -436,7 +436,7 @@ docker-run: ## Run Docker container
 # =============================================================================
 .PHONY: db-migrate
 db-migrate: ## Run database migrations
-	$(INFO) Running database migrations...
+	@$(INFO) Running database migrations...
 	@if [ -d "$(MIGRATIONS_DIR)" ]; then \
 		go run -tags 'postgres mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
 			-database "$(DATABASE_URL)" \
@@ -447,14 +447,14 @@ db-migrate: ## Run database migrations
 
 .PHONY: db-rollback
 db-rollback: ## Rollback database migration
-	$(INFO) Rolling back database migration...
+	@$(INFO) Rolling back database migration...
 	go run -tags 'postgres mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
 		-database "$(DATABASE_URL)" \
 		-path $(MIGRATIONS_DIR) down 1
 
 .PHONY: db-reset
 db-reset: ## Reset database
-	$(WARN) Resetting database...
+	@$(WARN) Resetting database...
 	go run -tags 'postgres mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
 		-database "$(DATABASE_URL)" \
 		-path $(MIGRATIONS_DIR) drop -f
@@ -464,13 +464,13 @@ db-reset: ## Reset database
 # =============================================================================
 .PHONY: report
 report: ## Generate project reports
-	$(INFO) Generating project reports...
+	@$(INFO) Generating project reports...
 	@mkdir -p $(DOCS_DIR)/reports
 	@$(MAKE) test-coverage
 	@$(MAKE) benchmark-report
 	@$(MAKE) lint-report
 	@$(MAKE) security-report
-	$(SUCCESS) Reports generated in $(DOCS_DIR)/reports
+	@$(SUCCESS) Reports generated in $(DOCS_DIR)/reports
 
 .PHONY: benchmark-report
 benchmark-report:
@@ -512,14 +512,14 @@ cd: ## Run CD pipeline
 # =============================================================================
 .PHONY: clean
 clean: ## Clean build artifacts
-	$(TRASH) Cleaning build artifacts...
+	@$(TRASH) Cleaning build artifacts...
 	rm -rf $(BIN_DIR) $(DIST_DIR)
 	$(GO) clean -cache -testcache -modcache
-	$(SUCCESS) Clean complete!
+	@$(SUCCESS) Clean complete!
 
 .PHONY: deps
 deps: ## Install dependencies
-	$(WORKING) Installing dependencies...
+	@$(WORKING) Installing dependencies...
 	$(GO) mod download
 	@if [ ! -f "$(GOLANGCI_LINT)" ]; then \
 		$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
@@ -536,27 +536,27 @@ deps: ## Install dependencies
 	@if [ ! -f "$(AIR)" ]; then \
 		$(GO) install github.com/air-verse/air@latest; \
 	fi
-	$(SUCCESS) Dependencies installed!
+	@$(SUCCESS) Dependencies installed!
 
 .PHONY: deps-update
 deps-update: ## Update dependencies
-	$(WORKING) Updating dependencies...
+	@$(WORKING) Updating dependencies...
 	$(GO) get -u ./...
 	$(GO) mod tidy
-	$(SUCCESS) Dependencies updated!
+	@$(SUCCESS) Dependencies updated!
 
 .PHONY: deps-verify
 deps-verify: ## Verify dependencies
-	$(INFO) Verifying dependencies...
+	@$(INFO) Verifying dependencies...
 	$(GO) mod verify
-	$(SUCCESS) Dependencies verified!
+	@$(SUCCESS) Dependencies verified!
 
 # =============================================================================
 # 📚 Documentation
 # =============================================================================
 .PHONY: docs
 docs: $(DOCS_DIR) ## Generate documentation
-	$(WORKING) Generating documentation...
+	@$(WORKING) Generating documentation...
 	@mkdir -p $(DOCS_DIR)
 	$(GO) doc -all > $(DOCS_DIR)/API.md
 	@if [ -f "README.md.tmpl" ]; then \
@@ -564,11 +564,11 @@ docs: $(DOCS_DIR) ## Generate documentation
 		BUILD_TIME=$(BUILD_TIME) \
 		envsubst < README.md.tmpl > README.md; \
 	fi
-	$(SUCCESS) Documentation generated!
+	@$(SUCCESS) Documentation generated!
 
 .PHONY: serve-docs
 serve-docs: ## Serve documentation locally
-	$(ROCKET) Serving documentation at http://localhost:6060
+	@$(ROCKET) Serving documentation at http://localhost:6060
 	$(GODOC) -http=:6060
 
 # =============================================================================
@@ -576,30 +576,30 @@ serve-docs: ## Serve documentation locally
 # =============================================================================
 .PHONY: tools
 tools: ## Install all tools
-	$(INFO) Installing tools...
+	@$(INFO) Installing tools...
 	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	$(GO) install mvdan.cc/gofumpt@latest
 	$(GO) install golang.org/x/vuln/cmd/govulncheck@latest
 	$(GO) install github.com/golang/mock/mockgen@latest
 	$(GO) install github.com/air-verse/air@latest
 	$(GO) install github.com/swaggo/swag/cmd/swag@latest
-	$(SUCCESS) Tools installed!
+	@$(SUCCESS) Tools installed!
 
 .PHONY: proto
 proto: ## Generate protocol buffers
-	$(WORKING) Generating protocol buffers...
+	@$(WORKING) Generating protocol buffers...
 	@if [ -d "$(PROTO_DIR)" ]; then \
 		protoc --go_out=. --go_opt=paths=source_relative \
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 			$(PROTO_DIR)/*.proto; \
 	fi
-	$(SUCCESS) Protocol buffers generated!
+	@$(SUCCESS) Protocol buffers generated!
 
 .PHONY: mock
 mock: ## Generate mocks
-	$(WORKING) Generating mocks...
+	@$(WORKING) Generating mocks...
 	$(MOCKGEN) -source=pkg/interfaces.go -destination=pkg/mocks/mocks.go
-	$(SUCCESS) Mocks generated!
+	@$(SUCCESS) Mocks generated!
 
 .PHONY: version
 version: ## Display version information

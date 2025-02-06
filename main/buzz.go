@@ -465,9 +465,7 @@ func (a *App) ParseArgs(g *gocui.Gui, args []string) error {
 			}
 
 			if arg == "--data-urlencode" {
-				// TODO: Replace with `url.PathEscape(..)` in Go 1.8
-				arg_data_url := &url.URL{Path: arg_data}
-				arg_data = arg_data_url.String()
+				arg_data = url.PathEscape(arg_data)
 			}
 
 			body_data = append(body_data, arg_data)
